@@ -59,6 +59,7 @@ class telloSDK:
             return -1
 
     def end(self, errorNum = 0):
+        sendMessage("land")
         self.running = False
         if(self.recvThread.is_alive):
             self.recvThread.join
