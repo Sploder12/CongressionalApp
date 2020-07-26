@@ -38,7 +38,7 @@ class telloSDK:
             except Exception as e:
                 if(self.running):
                     print (str(e))
-                    self.end(-3)
+                    self.end(-2)
     
     #returns -1 if failed, 1 is sucessful
     def sendMessage(self, msg):
@@ -59,7 +59,7 @@ class telloSDK:
             return -1
 
     def end(self, errorNum = 0):
-        sendMessage("land")
+        self.sendMessage("land")
         self.running = False
         if(self.recvThread.is_alive):
             self.recvThread.join
