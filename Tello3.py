@@ -20,7 +20,7 @@ class telloSDK:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock_video = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.tello_address = ('192.168.10.1', 8889)
+        self.tello_address = (constant.LOCAL_IP, 8889)
 
         self.sock.bind(self.locaddr)
 
@@ -38,7 +38,7 @@ class telloSDK:
 
         self.sendMessage("streamon")
 
-        self.sock_video.bind(('192.168.10.1', self.local_video_port))
+        self.sock_video.bind((constant.LOCAL_IP, self.local_video_port))
 
         # thread for receiving video
         self.recvVidThread = threading.Thread(target=self.recvVid)
@@ -76,8 +76,9 @@ class telloSDK:
                     self.mutexLock.release()
 
             except Exception as e:
-                print(str(e))
-                self.end(-2)
+                if(self.running):
+                    print(str(e))
+                    self.end(-2)
     
     def _h264_decode(self, packet_data):
         """
