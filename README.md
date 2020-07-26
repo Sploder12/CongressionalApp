@@ -3,10 +3,10 @@ Project for the congressional app challenge 2020
 
 ## Goals
 
-- [ ] tbd
-- [ ] tbd
-- [ ] tbd
-- [ ] tbd
+- [ ] Recieve video from Tello
+- [ ] Process video
+- [ ] Determine safe and unsafe social distancing
+- [ ] Sanitize
 
 ## Contribution Guide
 #### Putting in code
