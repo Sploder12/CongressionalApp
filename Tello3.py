@@ -3,13 +3,13 @@
 import threading 
 import socket
 import numpy as np
-import libh264decoder
+import h264Decoder
 
 import constant
 
 #class that contains all the data for the TelloSDK instance
 class telloSDK:
-    def __init__(self, port = 9001, host = ''):
+    def __init__(self, port = 9000, host = ''):
         self.running = True
 
         self.port = port
@@ -24,10 +24,11 @@ class telloSDK:
 
         self.sock.bind(self.locaddr)
 
-        self.local_video_port = 11111
+        self.local_video_port = 11110
 
         self.mutexLock = threading.Lock() #yay mutual exclusion
-        self.decoder = libh264decoder.H264Decoder()
+        self.endLock = threading.Lock()
+
         self.Bframe = None
 
         #recvThread create
@@ -87,7 +88,8 @@ class telloSDK:
         :return: a list of decoded frame
         """
         res_frame_list = []
-        frames = self.decoder.decode(packet_data)
+        """
+        frames = h264Decoder.decode(packet_data)
         for framedata in frames:
             (frame, w, h, ls) = framedata
             if frame is not None:
@@ -97,33 +99,40 @@ class telloSDK:
                 frame = (frame.reshape((h, ls / 3, 3)))
                 frame = frame[:, :w, :]
                 res_frame_list.append(frame)
-
+        """
         return res_frame_list
 
     #returns -1 if failed, 1 is sucessful
     def sendMessage(self, msg):
-        try:
-            if not msg:
-                return -1  
+        if self.running:
+            try:
+                if not msg:
+                    return -1  
 
-            if 'end' in msg:
-                self.end()
-                return 1
+                if 'end' in msg:
+                    self.end()
+                    return 1
 
-            # Send data
-            msg = msg.encode(encoding="utf-8") 
-            return self.sock.sendto(msg, self.tello_address) #returns number of bytes sent
-        except KeyboardInterrupt:
-            self.end(-1)
-            return -1
+                # Send data
+                msg = msg.encode(encoding="utf-8") 
+                return self.sock.sendto(msg, self.tello_address) #returns number of bytes sent
+            except KeyboardInterrupt:
+                self.end(-1)
+                return -1
 
     def end(self, errorNum = 0):
-        self.sendMessage("land")
-        self.running = False
-        if(self.recvThread.is_alive):
-            self.recvThread.join
-        if(self.recvVidThread.is_alive):
-            self.recvThread.join
-        self.sock.close()
-        #prints the exit code
-        print("Ended Tello: " + constant.END_NUMS.get(errorNum, "ERROR NUM DOES NOT EXIST: "+str(errorNum)))
+        self.endLock.acquire() #prevents several threads using end() at the same time
+        if self.running:
+            self.sendMessage("land")
+            self.running = False
+            if(self.recvThread.is_alive):
+                self.recvThread.join
+            self.sock.close()
+            if(self.recvVidThread.is_alive):
+                self.recvThread.join
+            self.sock_video.close()
+            #prints the exit code
+            print("Ended Tello: " + constant.END_NUMS.get(errorNum, "ERROR NUM DOES NOT EXIST: "+str(errorNum)))
+        else:
+            print("Attempted To End Already Ended Tello Instance")
+        self.endLock.release()
