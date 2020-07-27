@@ -9,52 +9,63 @@ import constant
 
 #class that contains all the data for the TelloSDK instance
 class telloSDK:
-    def __init__(self, port = 9000, host = ''):
+    def __init__(self, port = 8889, host = ''):
         self.running = True
 
         self.port = port
         self.host = host
-        self.locaddr = (host,port) 
 
         # Create a UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock_video = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.tello_address = (constant.LOCAL_IP, 8889)
+        self.tello_address = (constant.LOCAL_IP, port)
 
-        self.sock.bind(self.locaddr)
+        self.sock.bind((constant.LOCAL_IP, port))
 
-        self.local_video_port = 11110
+        self.local_video_port = 11111
 
         self.mutexLock = threading.Lock() #yay mutual exclusion
         self.endLock = threading.Lock()
 
+        self.response = None
         self.Bframe = None
 
-        #recvThread create
+        self.command_timeout = 0.3
+
+        #create recieve thread
         self.recvThread = threading.Thread(target=self.recv)
         self.recvThread.start()
 
         self.sendMessage("command") #needed to be in command mode
-
-        self.sendMessage("streamon")
+        self.sendMessage("streamon") #starts video stream
 
         self.sock_video.bind((constant.LOCAL_IP, self.local_video_port))
 
-        # thread for receiving video
+        #create video thread
         self.recvVidThread = threading.Thread(target=self.recvVid)
-
         self.recvVidThread.start()
   
+    def __del__(self):
+        self.sock.close()
+        self.sock_video.close()
+        self.running = False
+
     def recv(self):
         while self.recvThread.is_alive and self.running: 
             try:
-                data, server = self.sock.recvfrom(1518)
-                print(data.decode(encoding="utf-8"))
+                self.response, server = self.sock.recvfrom(3000)
+                print(self.response.decode(encoding="utf-8"))
 
             except Exception as e:
-                if(self.running):
-                    print (str(e))
+                if(type(e) == ConnectionResetError):
+                    print("Reseting Receive Data Connection")
+                    self.sock.close()
+                    self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    self.sock.bind((constant.LOCAL_IP, self.port))
+
+                elif(self.running):
+                    print(e)
                     self.end(-2)
     
     def recvVid(self):
@@ -77,7 +88,13 @@ class telloSDK:
                     self.mutexLock.release()
 
             except Exception as e:
-                if(self.running):
+                if(e == ConnectionResetError):
+                    print("Reseting Receive Video Connection")
+                    self.sock_video.close()
+                    self.sock_video = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    self.sock_video.bind((constant.LOCAL_IP, self.local_video_port))
+
+                elif(self.running):
                     print(str(e))
                     self.end(-2)
     
@@ -115,10 +132,37 @@ class telloSDK:
 
                 # Send data
                 msg = msg.encode(encoding="utf-8") 
-                return self.sock.sendto(msg, self.tello_address) #returns number of bytes sent
+                data = self.sock.sendto(msg, self.tello_address) #returns number of bytes sent
+                
+                self.abort_flag = False
+                timer = threading.Timer(self.command_timeout, self.set_abort_flag)
+
+                timer.start()
+                while self.response is None:
+                    if self.abort_flag is True:
+                        break
+                timer.cancel()
+
+                if self.response is None:
+                    response = 'none_response'
+                else:
+                    response = self.response.decode('utf-8')
+
+                self.response = None
+
+                return response
             except KeyboardInterrupt:
                 self.end(-1)
                 return -1
+
+    def set_abort_flag(self):
+        """
+        Sets self.abort_flag to True.
+        Used by the timer in Tello.send_command() to indicate to that a response
+        
+        timeout has occurred.
+        """
+        self.abort_flag = True
 
     def end(self, errorNum = 0):
         self.endLock.acquire() #prevents several threads using end() at the same time
@@ -134,5 +178,5 @@ class telloSDK:
             #prints the exit code
             print("Ended Tello: " + constant.END_NUMS.get(errorNum, "ERROR NUM DOES NOT EXIST: "+str(errorNum)))
         else:
-            print("Attempted To End Already Ended Tello Instance")
+            print("Attempted To End Already Ended Tello Instance With Code " + str(errorNum))
         self.endLock.release()
