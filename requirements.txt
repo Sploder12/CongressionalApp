@@ -1,3 +1,5 @@
-numpy==
-opencv==
+numpy==1.19.1
+opencv-contrib-python==4.3.0.36
+imutils==0.5.3
+argparse==1.4.0
 
