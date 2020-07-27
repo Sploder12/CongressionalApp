@@ -28,6 +28,8 @@ class telloSDK:
         self.mutexLock = threading.Lock() #yay mutual exclusion
         self.endLock = threading.Lock()
 
+        self.msgWait = threading.Condition() #cool anti-busy waiting technique
+
         self.response = None
         self.Bframe = None
 
@@ -56,7 +58,10 @@ class telloSDK:
             try:
                 self.response, server = self.sock.recvfrom(3000)
                 print(self.response.decode(encoding="utf-8"))
-
+                
+                self.msgWait.acquire()
+                self.msgWait.notify() #tell the main thread it can wake up
+                self.msgWait.release()
             except Exception as e:
                 if(type(e) == ConnectionResetError):
                     print("Reseting Receive Data Connection")
@@ -133,16 +138,12 @@ class telloSDK:
                 # Send data
                 msg = msg.encode(encoding="utf-8") 
                 data = self.sock.sendto(msg, self.tello_address) #returns number of bytes sent
-                
-                self.abort_flag = False
-                timer = threading.Timer(self.command_timeout, self.set_abort_flag)
 
-                timer.start()
-                while self.response is None:
-                    if self.abort_flag is True:
-                        break
-                timer.cancel()
+                #A non busy wait for response
+                if(self.response is None):
+                    self.msgWait.wait(self.command_timeout)                
 
+                #using the same if condition may seem redundant but response changes inbetween them thanks to multithreading
                 if self.response is None:
                     response = 'none_response'
                 else:
@@ -154,15 +155,6 @@ class telloSDK:
             except KeyboardInterrupt:
                 self.end(-1)
                 return -1
-
-    def set_abort_flag(self):
-        """
-        Sets self.abort_flag to True.
-        Used by the timer in Tello.send_command() to indicate to that a response
-        
-        timeout has occurred.
-        """
-        self.abort_flag = True
 
     def end(self, errorNum = 0):
         self.endLock.acquire() #prevents several threads using end() at the same time
