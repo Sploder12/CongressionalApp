@@ -3,7 +3,7 @@ import Tello3
 #gets the frame in a safe way.
 #Program will temporarily hang if reciever is writing the image
 frame = None
-def getImage(instance):
+def updateImage(instance):
     global frame
     instance.mutexLock.aquire()
     if(instance.BFrame == None):
