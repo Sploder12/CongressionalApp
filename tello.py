@@ -12,7 +12,7 @@ def getImage(instance):
 #instance of Tello3
 instance = Tello3.telloSDK()
 
-img = updateImage(instance)
+img = getImage(instance)
 
 #Make sure you end it when done!
 instance.end()
