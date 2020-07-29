@@ -3,7 +3,7 @@ import cv2
 
 #gets the frame in a safe way.
 #Program will temporarily hang if reciever is writing the image
-def updateImage(instance):
+def getImage(instance):
     instance.mutexLock.acquire()
     frame = instance.Bframe
     instance.mutexLock.release()
