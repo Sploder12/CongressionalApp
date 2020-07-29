@@ -1,7 +1,6 @@
 # http://www.ryzerobotics.com/
 import threading 
 import socket
-import numpy as np
 import cv2
 import constant
 
@@ -99,6 +98,13 @@ class telloSDK:
                 self.end(-2)
         self.telloVideo.release()
     
+    def getImage(self):
+        self.mutexLock.acquire()
+        frame = self.Bframe
+        self.mutexLock.release()
+        return frame
+
+
     #returns -1 if failed, 1 is sucessful
     def sendMessage(self, msg):
         if self.running:

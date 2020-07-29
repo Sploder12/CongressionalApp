@@ -1,19 +1,12 @@
 import Tello3
-import cv2
 
-#gets the frame in a safe way.
-#Program will temporarily hang if reciever is writing the image
-def getImage(instance):
-    instance.mutexLock.acquire()
-    frame = instance.Bframe
-    instance.mutexLock.release()
-    return frame
+#instance of Tello3 
+instance = Tello3.telloSDK() #will end if it can't connect to Tello (see ln 42/43 of Tello3.py)
+#if program hangs expect ln 42/43 of Tello3.py
 
-#instance of Tello3
-instance = Tello3.telloSDK()
+img = instance.getImage() #example: set frame to img
 
-img = getImage(instance)
+instance.sendMessage("forward 20") #example: moves Tello forward 20cm
 
-#Make sure you end it when done!
-instance.end()
+instance.end() #Make sure you end it when done!
 
