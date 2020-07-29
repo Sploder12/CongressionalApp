@@ -41,6 +41,7 @@ class telloSDK:
 
         self.ret = False
         self.telloVideo = cv2.VideoCapture("udp://@" + constant.LOCAL_IP + ":" + str(self.local_video_port))
+        #self.telloVideo = cv2.VideoCapture("test.mp4) #used for testing when Tello not present
         self.scale = 3
 
         #create video thread
@@ -89,12 +90,14 @@ class telloSDK:
                         height , width , layers =  frame.shape
                         new_h=int(height/self.scale)
                         new_w=int(width/self.scale)
-                        self.Bframe = cv2.resize(frame, (new_w, new_h))
+                        self.Bframe = cv2.resize(frame, (new_w, new_h)) #resizes image
+                        #cv2.imwrite("opt.png", self.Bframe)
                         self.mutexLock.release()
 
             except Exception as e:
                 print(str(e))
                 self.end(-2)
+        self.telloVideo.release()
     
     #returns -1 if failed, 1 is sucessful
     def sendMessage(self, msg):
@@ -140,7 +143,6 @@ class telloSDK:
             self.sock.close()
             if(self.recvVidThread.is_alive):
                 self.recvThread.join
-            self.telloVideo.release()
             #prints the exit code
             print("Ended Tello: " + constant.END_NUMS.get(errorNum, "ERROR NUM DOES NOT EXIST: "+str(errorNum)))
         else:
