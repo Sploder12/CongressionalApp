@@ -4,7 +4,7 @@ Project for the congressional app challenge 2020
 
 ## Goals
 
-- [ ] Recieve video from Tello
+- [X] Recieve video from Tello
 - [ ] Process video
 - [ ] Determine safe and unsafe social distancing
 - [ ] Sanitize
