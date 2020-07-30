@@ -3,15 +3,18 @@ import argparse
 import time
 import cv2
 import os
-import grabvideo
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-# ap.add_argument("-i", "--image", required=True, help="path to input")
+ap.add_argument("-p", "--input", required=True, help="1 for image 2 for drone")
+ap.add_argument("-i", "--image", help="path to input")
 ap.add_argument("-y", "--yolo", required=True, help="path to yolo DIR")
 ap.add_argument("-c", "--confidence", type=float, default=0.5, help="minimum probobility to filter weak detections")
 ap.add_argument("-t", "--threshold", type=float, default=0.3, help="threshold when applying non-maxima suppression")
 args = vars(ap.parse_args())
+if args["input"] == "2":
+	print("Now Loading: Tello3.py")
+	import grabvideo
 
 # load the COCO class labels our YOLO model was trained on
 labelsPath = os.path.sep.join([args["yolo"], "coco.names"])
@@ -30,7 +33,10 @@ print("[INFO] loading YOLO from disk...")
 net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
 
 # load our input image and grab its spatial dimensions
-image = cv2.imread(grabvideo.img)
+if args["input"] == "1":
+	image = cv2.imread(args["image"])
+elif args["input"] == "2":
+	image = cv2.imread(grabvideo.img)
 (H, W) = image.shape[:2]
 
 # determine only the *output* layer names that we need from YOLO
