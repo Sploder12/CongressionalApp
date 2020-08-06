@@ -36,7 +36,8 @@ net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
 if args["input"] == "1":
 	image = cv2.imread(args["image"])
 elif args["input"] == "2":
-	image = cv2.imread(grabvideo.img)
+    image = cv2.imread(grabvideo.img)
+    print(image)
 (H, W) = image.shape[:2]
 
 # determine only the *output* layer names that we need from YOLO
