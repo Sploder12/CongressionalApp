@@ -28,6 +28,9 @@ def getImage(instance):
 # instance of Tello3
 instance = Tello3.telloSDK()
 
+# fix for multithreading issue
+time.sleep(0.08)
+
 # gets the returned frame from the function
 img = getImage(instance)
 
@@ -51,8 +54,8 @@ net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
 if args["input"] == "1":
 	image = cv2.imread(args["image"])
 elif args["input"] == "2":
-    image = cv2.imread(img)
-    print(image)
+	image = img
+	print(image)
 (H, W) = image.shape[:2]
 
 # determine only the *output* layer names that we need from YOLO
