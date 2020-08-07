@@ -10,10 +10,10 @@ def getImage(instance):
     return frame
 
 #instance of Tello3
-instance = Tello3.telloSDK()
+#instance = Tello3.telloSDK()
 
-img = getImage(instance)
+#img = getImage(instance)
 
 #Make sure you end it when done!
-instance.end()
+#instance.end()
 
