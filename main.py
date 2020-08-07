@@ -12,20 +12,23 @@ ap.add_argument("-y", "--yolo", required=True, help="path to yolo DIR")
 ap.add_argument("-c", "--confidence", type=float, default=0.5, help="minimum probobility to filter weak detections")
 ap.add_argument("-t", "--threshold", type=float, default=0.3, help="threshold when applying non-maxima suppression")
 args = vars(ap.parse_args())
+
+# loads the drone stuff if needed
 if args["input"] == "2":
 	print("Now Loading: Tello3.py")
 	import Tello3
-#gets the frame in a safe way.
-#Program will temporarily hang if reciever is writing the image
+
+# gets the frame in a safe way. Program will temporarily hang if reciever is writing the image
 def getImage(instance):
     instance.mutexLock.acquire()
     frame = instance.Bframe
     instance.mutexLock.release()
-    return frame
+    return frame # currently returns none, need to fix
 
-#instance of Tello3
+# instance of Tello3
 instance = Tello3.telloSDK()
 
+# gets the returned frame from the function
 img = getImage(instance)
 
 # load the COCO class labels our YOLO model was trained on
