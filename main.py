@@ -14,7 +14,19 @@ ap.add_argument("-t", "--threshold", type=float, default=0.3, help="threshold wh
 args = vars(ap.parse_args())
 if args["input"] == "2":
 	print("Now Loading: Tello3.py")
-	import grabvideo
+	import Tello3
+#gets the frame in a safe way.
+#Program will temporarily hang if reciever is writing the image
+def getImage(instance):
+    instance.mutexLock.acquire()
+    frame = instance.Bframe
+    instance.mutexLock.release()
+    return frame
+
+#instance of Tello3
+instance = Tello3.telloSDK()
+
+img = getImage(instance)
 
 # load the COCO class labels our YOLO model was trained on
 labelsPath = os.path.sep.join([args["yolo"], "coco.names"])
@@ -36,7 +48,7 @@ net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
 if args["input"] == "1":
 	image = cv2.imread(args["image"])
 elif args["input"] == "2":
-    image = cv2.imread(grabvideo.img)
+    image = cv2.imread(img)
     print(image)
 (H, W) = image.shape[:2]
 
@@ -114,3 +126,5 @@ if len(idxs) > 0:
 # show the output image
 cv2.imshow("Image", image)
 cv2.waitKey(0)
+#Make sure you end it when done!
+instance.end()
