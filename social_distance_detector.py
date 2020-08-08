@@ -10,6 +10,7 @@ import numpy as np
 import argparse
 import imutils
 import cv2
+import time
 import os
 from tello import *
 from Tello3 import *
@@ -51,7 +52,7 @@ ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 print("[INFO] accessing video stream...")
 #vs = cv2.VideoCapture(args["input"] if args["input"] else 0)
 writer = None
-
+instance = Tello3.telloSDK()
 # loop over the frames from the video stream
 while True:
 	# Below is where the frame is entered
@@ -65,13 +66,11 @@ while True:
 
 	# resize the frame and then detect people (and only people) in it
 	#instance of Tello3
-	instance = Tello3.telloSDK()
-
+	time.sleep(0.05)
 	frame = getImage(instance)
-	print(frame) #returns None as of now
+	print(frame, "NEW FRAME") #frames start repeating itself for some reason
 
 	#Make sure you end it when done!
-	instance.end()
 
 	results = detect_people(frame, net, ln,
 		personIdx=LABELS.index("person"))
@@ -147,3 +146,4 @@ while True:
 	# video file
 	if writer is not None:
 		writer.write(frame)
+instance.end()
