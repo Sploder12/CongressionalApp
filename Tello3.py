@@ -24,6 +24,7 @@ class telloSDK:
         self.mutexLock = threading.Lock() #yay mutual exclusion
         self.endLock = threading.Lock()
 
+        self.startWait = threading.Condition()
         self.msgWait = threading.Condition() #cool anti-busy waiting technique
 
         self.response = None
@@ -39,8 +40,8 @@ class telloSDK:
         self.sendMessage("streamon") #starts video stream
 
         self.ret = False
-        self.telloVideo = cv2.VideoCapture("udp://@" + constant.LOCAL_IP + ":" + str(self.local_video_port))
-        #self.telloVideo = cv2.VideoCapture("test.mp4) #used for testing when Tello not present
+        #self.telloVideo = cv2.VideoCapture("udp://@" + constant.LOCAL_IP + ":" + str(self.local_video_port))
+        self.telloVideo = cv2.VideoCapture("test.mp4") #used for testing when Tello not present
         self.scale = 3
 
         #create video thread
@@ -49,6 +50,10 @@ class telloSDK:
             self.end(-3)
         else:
             self.recvVidThread.start()
+            self.startWait.acquire()
+            self.startWait.wait(5)
+            self.startWait.release()
+            
   
     def __del__(self):
         self.sock.close()
@@ -92,6 +97,10 @@ class telloSDK:
                         self.Bframe = cv2.resize(frame, (new_w, new_h)) #resizes image
                         #cv2.imwrite("opt.png", self.Bframe)
                         self.mutexLock.release()
+
+                        self.startWait.acquire()
+                        self.startWait.notify()
+                        self.startWait.release()
 
             except Exception as e:
                 print(str(e))
