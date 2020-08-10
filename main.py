@@ -3,7 +3,7 @@ import argparse
 import time as tim
 import cv2
 import os
-import objectnames
+import constant
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -136,7 +136,7 @@ if(x == 0):
 	LABELS = open(labelsPath).read().strip().split("\n")
 	print(LABELS)
 else:
-	LABELS = objectnames.objects.get(x)
+	LABELS = constant.objects.get(x)
 	print(LABELS)
 # initialize a list of colors to represent each possible class label
 np.random.seed(42)
