@@ -66,9 +66,9 @@ while True:
 
 	# resize the frame and then detect people (and only people) in it
 	#instance of Tello3
-	time.sleep(0.05)
+	time.sleep(0.08)
 	frame = getImage(instance)
-	print(frame, "NEW FRAME") #frames start repeating itself for some reason
+	print(frame, "NEW FRAME")
 
 	#Make sure you end it when done!
 
@@ -146,4 +146,5 @@ while True:
 	# video file
 	if writer is not None:
 		writer.write(frame)
+
 instance.end()
