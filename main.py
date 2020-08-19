@@ -130,17 +130,7 @@ print("[INFO] accessing video stream...")
 writer = None
 
 # instance of Tello3
-instance = Tello3.telloSDK()
-speed = instance.sendMessage("speed?")
-battery = instance.sendMessage("battery?")
-time = instance.sendMessage("time?")
-height = instance.sendMessage("height?")
-temp = instance.sendMessage("temp?")
-altitude = instance.sendMessage("altitude?")
-barometer = instance.sendMessage("baro?")
-acceleration = instance.sendMessage("acceleration?")
-tof = instance.sendMessage("tof?") # idk what tof is
-wifi = instance.sendMessage("wifi?")
+instance = Tello3.telloSDK()	
 
 # loop over the frames from the video stream
 def detect_people(frame, net, ln):
