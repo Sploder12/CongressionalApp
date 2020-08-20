@@ -16,7 +16,7 @@ class telloSDK:
         # Create a UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.tello_address = (constant.LOCAL_IP, port)
+        self.tello_address = (constant.TELLO_IP, port) #change TELLO_IP to LOCAL_IP if testing without drone
 
         self.sock.bind((constant.LOCAL_IP, port))
 

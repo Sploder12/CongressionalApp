@@ -66,3 +66,19 @@ def figure8(instance, size, speed):
         instance.sendMessage("curve " + str(pnt1[0]) + " 0 " + str(pnt1[1]) + " " + str(pnt2[0]) + " 0 " + str(pnt2[1]) + " " + str(speed))
 
     return 1
+
+tello = Tello3.telloSDK()
+while(True):
+    msg = input("Enter Message: ")
+
+    if(msg == "end"):
+        tello.sendMessage(msg)
+        break
+    elif(msg == "fig8"):
+        figure8(tello, 200, 50)
+    elif(msg == "poly"):
+        flyPolygon(tello, 150, 3)
+    else:
+        tello.sendMessage(msg)
+
+tello.end()

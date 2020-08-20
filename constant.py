@@ -10,3 +10,6 @@ END_NUMS = {
 
 HOST_NAME = socket.gethostname()
 LOCAL_IP = socket.gethostbyname(HOST_NAME)
+TELLO_IP = "192.168.10.1" 
+
+TELLO_CAMERA_THETA = 0 #angle of depression for camera
