@@ -1,0 +1,6 @@
+scipy==1.5.2
+numpy==1.19.1
+wheel==0.34.2
+mkl==2019.0
+intel-openmp==2019.0
+imutils==0.5.3
