@@ -16,9 +16,9 @@ class getinfo:
     def gettemp(self):
         temp = instance.sendMessage("temp?")
         return temp
-    def getattitude(self):
-        attitude = instance.sendMessage("attitude?")
-        return attitude
+    def getaltitude(self):
+        altitude = instance.sendMessage("altitude?")
+        return altitude
     def getbarometer(self):
         barometer = instance.sendMessage("baro?")
         return barometer

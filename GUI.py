@@ -1,7 +1,7 @@
 import sys
 import threading
 from Tello3 import *
-from getinfo import *
+from getinfo import getinfo
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QWidget, QToolTip,
     QPushButton, QApplication, QProgressBar, QSlider, QLCDNumber)
@@ -44,37 +44,6 @@ class guiForDrone(QWidget):
 
     def land(self):
         instance.sendMessage("land")
-
-    def getspeed(self):
-        speed = instance.sendMessage("speed?")
-        return speed
-    def getbattery(self):
-        battery = instance.sendMessage("battery?")
-        return battery
-    def gettime(self):
-        time = instance.sendMessage("time?")
-        return time
-    def getheight(self):
-        height = instance.sendMessage("height?")
-        return height
-    def gettemp(self):
-        temp = instance.sendMessage("temp?")
-        return temp
-    def getaltitude(self):
-        altitude = instance.sendMessage("altitude?")
-        return altitude
-    def getbarometer(self):
-        barometer = instance.sendMessage("baro?")
-        return barometer
-    def getacceleration(self):
-        acceleration = instance.sendMessage("acceleration?")
-        return acceleration
-    def gettof(self):
-        tof = instance.sendMessage("tof?") # idk what tof is
-        return tof
-    def getwifi(self):
-        wifi = instance.sendMessage("wifi?")
-        return wifi
 
     def __init__(self):
         super().__init__()
