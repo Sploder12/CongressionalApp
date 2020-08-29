@@ -15,7 +15,7 @@ class telloSDK:
         # Create a UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.tello_address = (constant.TELLO_IP, port) #change TELLO_IP to LOCAL_IP if testing without drone
+        self.tello_address = (constant.LOCAL_IP, port) #change TELLO_IP to LOCAL_IP if testing without drone
 
         self.sock.bind((constant.LOCAL_IP, port))
 
@@ -40,8 +40,8 @@ class telloSDK:
         self.sendMessage("streamon") #starts video stream
 
         self.ret = False
-        self.telloVideo = cv2.VideoCapture("udp://@" + constant.TELLO_IP + ":" + str(self.local_video_port))
-        #self.telloVideo = cv2.VideoCapture("test.mp4") #used for testing when Tello not present
+        #self.telloVideo = cv2.VideoCapture("udp://@" + constant.TELLO_IP + ":" + str(self.local_video_port))
+        self.telloVideo = cv2.VideoCapture("test.mp4") #used for testing when Tello not present
         self.scale = 3
 
         #create video thread
