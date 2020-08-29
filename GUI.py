@@ -1,7 +1,8 @@
 import sys
-import threading
-from Tello3 import *
-from getinfo import getinfo
+import Tello3
+import tello
+import math
+# from getinfo import getinfo
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QWidget, QToolTip,
     QPushButton, QApplication, QProgressBar, QSlider, QLCDNumber)
@@ -45,6 +46,92 @@ class guiForDrone(QWidget):
     def land(self):
         instance.sendMessage("land")
 
+    def getspeed(self):
+        speed = instance.sendMessage("speed?")
+        return speed
+    def getbattery(self):
+        battery = instance.sendMessage("battery?")
+        return battery
+    def gettime(self):
+        time = instance.sendMessage("time?")
+        return time
+    def getheight(self):
+        height = instance.sendMessage("height?")
+        return height
+    def gettemp(self):
+        temp = instance.sendMessage("temp?")
+        return temp
+    def getaltitude(self):
+        altitude = instance.sendMessage("altitude?")
+        return altitude
+    def getbarometer(self):
+        barometer = instance.sendMessage("baro?")
+        return barometer
+    def getacceleration(self):
+        acceleration = instance.sendMessage("acceleration?")
+        return acceleration
+    def gettof(self):
+        tof = instance.sendMessage("tof?") # idk what tof is
+        return tof
+    def getwifi(self):
+        wifi = instance.sendMessage("wifi?")
+        return wifi
+
+    def flyPolygon(self):
+        sides = 5
+        size = 150
+        if(sides > 360 or sides < 3):
+            return -1
+        if(size > 500 or size < 20):
+            return -1
+
+        rotation = 360/sides
+        if(sides != 4):
+            if(sides == 3): 
+                instance.sendMessage("cw 30")
+            else:
+                instance.sendMessage("ccw " + str(90-rotation))
+
+        for i in range(sides):
+            instance.sendMessage("forward " + str(size))
+            if i == sides:
+                instance.sendMessage("cw 90") #drone ends the same way it starts
+            else:
+                instance.sendMessage("cw " + str(rotation))
+        return 1
+
+    #Flys in a figure 8 starting the the middle
+    #_in_ instance : telloSDK instance
+    #_in_ size : number 50 - 500
+    #_in_ speed : number 10-60 cm/s
+    #
+    #_out_ status : bool -1?1
+    def figure8(self):
+        size = 150
+        speed = 50
+        if(size < 50 or size > 500):
+            return -1
+        if(speed < 10 or speed > 60):
+            return -1
+
+        #we're heavily assuming that curve uses relative postion instead of some magical absolute position that makes life suck (documentation is unclear)
+        #also assuming that the drone's x/y/z axis are also relative to rotation
+        #5% chance this works as is
+        instance.sendMessage("cw 90")
+        x = lambda rad: math.sin(rad)*size
+        y = lambda rad: math.cos(rad)*size
+        pnt1 = (x(0.25*math.pi), y(1.25*math.pi) + size) 
+        pnt2 = (x(0.5*math.pi), y(0.5*math.pi) + size)
+        for i in range(4): #first circle
+            instance.sendMessage("curve " + str(pnt1[0]) + " 0 " + str(pnt1[1]) + " " + str(pnt2[0]) + " 0 " + str(pnt2[1]) + " " + str(speed))
+
+        pnt1 = (x(0.25*math.pi), y(0.25*math.pi) - size) 
+        pnt2 = (x(0.5*math.pi), y(0.5*math.pi) - size)
+        for i in range(4): #second circle
+            instance.sendMessage("curve " + str(pnt1[0]) + " 0 " + str(pnt1[1]) + " " + str(pnt2[0]) + " 0 " + str(pnt2[1]) + " " + str(speed))
+
+        return 1
+        
     def __init__(self):
         super().__init__()
 
@@ -161,6 +248,38 @@ class guiForDrone(QWidget):
 
         wifiLabel = QtWidgets.QLabel('Wifi: ', self)
         wifiLabel.setGeometry(QtCore.QRect(900, 235, 75, 20))
+
+        flyPolygonBtn = QtWidgets.QPushButton('Fly Polygon', self)
+        flyPolygonBtn.setGeometry(QtCore.QRect(490, 660, 100, 30))
+        flyPolygonBtn.clicked[bool].connect(self.flyPolygon)
+
+        # sidesPolygon = QtWidgets.QSpinBox(self)
+        # sidesPolygon.setGeometry(QtCore.QRect(490, 630, 42, 22))
+
+        # label = QtWidgets.QLabel('Size', self)
+        # label.setGeometry(QtCore.QRect(490, 610, 55, 16))
+
+        # sizePolygon = QtWidgets.QSpinBox(self)
+        # sizePolygon.setGeometry(QtCore.QRect(560, 630, 42, 22))
+
+        # label_2 = QtWidgets.QLabel('Sides')
+        # label_2.setGeometry(QtCore.QRect(560, 610, 55, 16))
+        
+        figure8Btn = QtWidgets.QPushButton('Figure 8', self)
+        figure8Btn.setGeometry(QtCore.QRect(680, 660, 100, 30))
+        figure8Btn.clicked[bool].connect(self.figure8)
+
+        # label_3 = QtWidgets.QLabel('Size', self)
+        # label_3.setGeometry(QtCore.QRect(670, 610, 55, 16))
+
+        # size8 = QtWidgets.QSpinBox(self)
+        # size8.setGeometry(QtCore.QRect(740, 630, 42, 22))
+
+        # label_4 = QtWidgets.QLabel('Sides', self)
+        # label_4.setGeometry(QtCore.QRect(740, 610, 55, 16))
+
+        # sides8 = QtWidgets.QSpinBox(self)
+        # sides8.setGeometry(QtCore.QRect(670, 630, 42, 22))
 
         self.setGeometry(300, 300, 300, 200)
         self.show()

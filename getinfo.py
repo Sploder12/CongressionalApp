@@ -1,4 +1,5 @@
-import Tello3
+from Tello3 import *
+from tello import *
 instance = Tello3.telloSDK()
 class getinfo:
     def getspeed(self):
