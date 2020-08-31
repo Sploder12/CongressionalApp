@@ -14,21 +14,46 @@ class telloSDK:
 
         # Create a UDP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.Dsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.tello_address = (constant.LOCAL_IP, port) #change TELLO_IP to LOCAL_IP if testing without drone
 
         self.sock.bind((constant.LOCAL_IP, port))
 
+        self.stats_port = 8890
+        self.Dsock.bind((constant.LOCAL_IP, self.stats_port))
+
         self.local_video_port = 11111
 
         self.mutexLock = threading.Lock() #yay mutual exclusion
+        self.datLock = threading.Lock()
         self.endLock = threading.Lock()
 
         self.startWait = threading.Condition()
         self.msgWait = threading.Condition() #cool anti-busy waiting technique
 
+        self.data = None
         self.response = None
         self.Bframe = None
+
+        #don't access these directly !!!!!!!!!! (thank you python for not having private variables)
+        self.pitch = None
+        self.roll = None
+        self.yaw = None
+        self.xSpeed = None
+        self.ySpeed = None
+        self.zSpeed = None
+        self.lowTemp = None
+        self.highTemp = None
+        self.TOFdist = None
+        self.height = None
+        self.battery = None
+        self.barometer = None
+        self.Mtime = None
+        self.xAccel = None
+        self.yAccel = None
+        self.zAccel = None
+        #You can some touch other things but not these
 
         self.command_timeout = 0.3
 
@@ -38,6 +63,9 @@ class telloSDK:
 
         self.sendMessage("command") #needed to be in command mode
         self.sendMessage("streamon") #starts video stream
+
+        self.recvStats = threading.Thread(target=self.recvDat)
+        self.recvStats.start()
 
         self.ret = False
         #self.telloVideo = cv2.VideoCapture("udp://@" + constant.TELLO_IP + ":" + str(self.local_video_port))
@@ -57,6 +85,7 @@ class telloSDK:
   
     def __del__(self):
         self.sock.close()
+        self.Dsock.close()
         self.telloVideo.release()
         self.running = False
         
@@ -80,6 +109,68 @@ class telloSDK:
                     print(e)
                     self.end(-2)
     
+    def recvDat(self):
+        while self.recvStats.is_alive and self.running:
+            try:
+                response, server = self.Dsock.recvfrom(3000)
+                print(response.decode(encoding="utf-8"))
+
+                self.datLock.acquire()
+                self.data = response
+
+                #dumbest parsing possible
+                splitonce = response.split(';') #split the response into seperate strings for each variable
+                splittwice = []
+                for string in splitonce:
+                    splittwice.append(string.split(':')) #split the split response into pairs of variable name and data
+            
+                self.pitch = int(splittwice[0][1])
+                self.roll = int(splittwice[1][1])
+                self.yaw = int(splittwice[2][1])
+                self.xSpeed = int(splittwice[3][1])
+                self.ySpeed = int(splittwice[4][1])
+                self.zSpeed = int(splittwice[5][1])
+                self.lowTemp = int(splittwice[6][1])
+                self.highTemp = int(splittwice[7][1])
+                self.TOFdist = int(splittwice[8][1])
+                self.height = int(splittwice[9][1])
+                self.battery = int(splittwice[10][1])
+                self.barometer = float(splittwice[11][1])
+                self.Mtime = float(splittwice[12][1])
+                self.xAccel = float(splittwice[13][1])
+                self.yAccel = float(splittwice[14][1])
+                self.zAccel = float(splittwice[15][1])
+
+                self.datLock.release()
+            except Exception as e:
+                if(type(e) == ConnectionResetError):
+                    print("Reseting Receive Data Connection")
+                    self.sock.close()
+                    self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    self.sock.bind((constant.LOCAL_IP, self.port))
+
+                elif(self.running):
+                    print("Data retrieve error: " + str(e))
+                    self.end(-2)
+                
+    def getRawDat(self):
+        self.datLock.acquire()
+        tmp = self.data
+        self.datLock.release()
+        return tmp
+
+    #returns a dictionary of all the data
+    def getDat(self):
+        self.datLock.acquire()
+        out = {"pitch":self.pitch, "roll":self.roll, "yaw":self.yaw, #attitude
+                "xSpeed":self.xSpeed, "ySpeed":self.ySpeed, "zSpeed":self.zSpeed, #speeds
+                "lowestTemp":self.lowTemp, "highestTemp":self.highTemp, "barometer":self.barometer, #environment data
+                "TOF":self.TOFdist, "battery%":self.battery, "motorTime":self.Mtime,"height":self.height, #flight data
+                "xAccel":self.xAccel, "yAccel":self.yAccel, "zAccel":self.zAccel} #acceleration data
+        self.datLock.release()
+        return out
+
+
     def recvVid(self):
         """
         Runs as a thread, sets self.Bframe to the most recent frame Tello captured.
@@ -112,7 +203,6 @@ class telloSDK:
         frame = self.Bframe
         self.mutexLock.release()
         return frame
-
 
     #returns -1 if failed, 1 is sucessful
     def sendMessage(self, msg):

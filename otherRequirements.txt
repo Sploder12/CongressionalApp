@@ -1,0 +1,4 @@
+#these don't work with pip
+mkl==2019.0
+intel-openmp==2019.0
+aqtinstall==1.15.0

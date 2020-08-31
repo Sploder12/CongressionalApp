@@ -1,4 +1,9 @@
+wheel==0.34.2
 numpy==1.19.1
 opencv-contrib-python==4.3.0.36
 argparse==1.4.0
-
+scipy==1.5.2
+imutils==0.5.3
+PyQt5==5.15.0
+PySide2==5.15.0
+pyuic5-tool==0.0.1

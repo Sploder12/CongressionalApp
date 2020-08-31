@@ -1,4 +1,0 @@
-aqtinstall = 1.15.0
-PyQt5 = 5.15.0
-PySide2 = 5.15.0
-pyuic5-tool = 0.0.1

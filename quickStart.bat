@@ -1,0 +1,2 @@
+python tello.py
+pause
