@@ -1,6 +1,7 @@
 import Tello3
 import math
 import time
+import cv2
 
 # Flys in a polygon shape starting on the bottom leftmost pont
 #_in_ instance : telloSDK instance
@@ -8,8 +9,8 @@ import time
 #_in_ sides : integer 3 - 360
 #_out_ status : bool -1?1
 def flyPolygon(instance, size, sides):
-    dat = instance.getDat()
-    speed = dat["xSpeed"] + dat["ySpeed"] + dat["zSpeed"]
+    #dat = instance.getDat()
+    #speed = abs(dat["xSpeed"]) + abs(dat["ySpeed"]) + abs(dat["zSpeed"]) #you'd think something couldn't have a negative speed but oh well
     if(sides > 360 or sides < 3):
         return -1
     if(size > 500 or size < 20):
@@ -26,7 +27,7 @@ def flyPolygon(instance, size, sides):
 
     for i in range(sides):
         instance.sendMessage("forward " + str(size))
-        time.sleep(size/speed + 0.5)
+        time.sleep(0.5)
         if i == sides:
             instance.sendMessage("cw 90") #drone ends the same way it starts
             time.sleep(0.5)
@@ -68,3 +69,23 @@ def figure8(instance, size, speed):
         time.sleep(distance/speed + 0.5)
 
     return 1
+
+tello = Tello3.telloSDK()
+while(True):
+    
+    #msg = input("Enter Message: ")
+    img = tello.getImage()
+    cv2.imshow('image',img)
+    cv2.waitKey(1)
+    #if(msg == "end"):
+    #    tello.sendMessage(msg)
+    #    break
+    #elif(msg == "fig8"):
+    #    figure8(tello, 200, 50)
+    #elif(msg == "poly"):
+    #    flyPolygon(tello, 150, 3)
+    #else:
+    #    tello.sendMessage(msg)
+
+cv2.destroyAllWindows()
+tello.end()
