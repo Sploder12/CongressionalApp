@@ -20,20 +20,20 @@ def flyPolygon(instance, size, sides):
     if(sides != 4):
         if(sides == 3): 
             instance.sendMessage("cw 30")
-            time.sleep(0.5)
+            time.sleep(1)
         else:
             instance.sendMessage("ccw " + str(90-rotation))
-            time.sleep(0.5)
+            time.sleep(1)
 
     for i in range(sides):
         instance.sendMessage("forward " + str(size))
-        time.sleep(0.5)
+        time.sleep(1)
         if i == sides:
             instance.sendMessage("cw 90") #drone ends the same way it starts
-            time.sleep(0.5)
+            time.sleep(1)
         else:
             instance.sendMessage("cw " + str(rotation))
-            time.sleep(0.5)
+            time.sleep(1)
     return 1
 
 #Flys in a figure 8 starting the the middle
@@ -70,13 +70,13 @@ def figure8(instance, size, speed):
 
     return 1
 
-tello = Tello3.telloSDK()
-while(True):
-    
+#tello = Tello3.telloSDK()
+#while(True):
+    print(tello.getDat())
     #msg = input("Enter Message: ")
-    img = tello.getImage()
-    cv2.imshow('image',img)
-    cv2.waitKey(1)
+    #img = tello.getImage()
+    #cv2.imshow('image',img)
+    #cv2.waitKey(1)
     #if(msg == "end"):
     #    tello.sendMessage(msg)
     #    break
@@ -87,5 +87,5 @@ while(True):
     #else:
     #    tello.sendMessage(msg)
 
-cv2.destroyAllWindows()
-tello.end()
+#cv2.destroyAllWindows()
+#tello.end()

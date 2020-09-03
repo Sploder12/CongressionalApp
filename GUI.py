@@ -15,7 +15,7 @@ class guiForDrone(QWidget):
         instance.sendMessage("forward 20")
     
     def backward(self):
-        instance.sendMessage("backward 20")
+        instance.sendMessage("back 20")
 
     def right(self):
         instance.sendMessage("right 20")
