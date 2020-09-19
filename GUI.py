@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import (QWidget, QToolTip,
 from PyQt5.QtGui import QFont
 
 instance = Tello3.telloSDK()
-#where to end the instance???
 class guiForDrone(QWidget):
     
     def forward(self):
@@ -44,46 +43,6 @@ class guiForDrone(QWidget):
 
     def land(self):
         instance.sendMessage("land")
-
-    def getspeed(self):
-        speed = instance.sendMessage("speed?")
-        return speed
-
-    def getbattery(self):
-        battery = instance.sendMessage("battery?")
-        return battery
-
-    def gettime(self):
-        time = instance.sendMessage("time?")
-        return time
-
-    def getheight(self):
-        height = instance.sendMessage("height?")
-        return height
-
-    def gettemp(self):
-        temp = instance.sendMessage("temp?")
-        return temp
-
-    def getattitude(self):
-        attitude = instance.sendMessage("attitude?")
-        return attitude
-
-    def getbarometer(self):
-        barometer = instance.sendMessage("baro?")
-        return barometer
-
-    def getacceleration(self):
-        acceleration = instance.sendMessage("acceleration?")
-        return acceleration
-
-    def gettof(self):
-        tof = instance.sendMessage("tof?") # idk what tof is
-        return tof
-        
-    def getwifi(self):
-        wifi = instance.sendMessage("wifi?")
-        return wifi
 
     def flyPolygon(self):
         sides = 5
@@ -148,16 +107,24 @@ class guiForDrone(QWidget):
         self.setFixedWidth(1280)
         self.setFixedHeight(720)
 
-        self.speedLabel = QtWidgets.QLabel('Speed: ', self)
-        self.batteryLabel = QtWidgets.QLabel('Battery: ', self)
-        self.timeLabel = QtWidgets.QLabel('Time: ', self)
-        self.heightLabel = QtWidgets.QLabel('Height: ', self)
-        self.tempLabel = QtWidgets.QLabel('Temp: ', self)
-        self.attitudeLabel = QtWidgets.QLabel('Attitude: ', self)
-        self.barometerLabel = QtWidgets.QLabel('Barometer: ', self)
-        self.accelerationLabel = QtWidgets.QLabel('Acceleration: ', self)
-        self.tofLabel = QtWidgets.QLabel('TOF: ', self)
-        self.wifiLabel = QtWidgets.QLabel('Wifi: ', self)
+        self.pitchLabel = QtWidgets.QLabel("pitch", self)
+        self.rollLabel = QtWidgets.QLabel("roll", self)
+        self.yawLabel = QtWidgets.QLabel("yaw", self)
+        self.pitchLabel = QtWidgets.QLabel("pitch", self)
+        self.xSpeedLabel = QtWidgets.QLabel("xSpeed", self)
+        self.ySpeedLabel = QtWidgets.QLabel("ySpeed", self)
+        self.zSpeedLabel = QtWidgets.QLabel("zSpeed", self)
+        self.lowestTempLabel = QtWidgets.QLabel("lowestTemp", self)
+        self.highestTempLabel = QtWidgets.QLabel("highestTemp", self)
+        self.barometerLabel = QtWidgets.QLabel("barometer", self)
+        self.TOFLabel = QtWidgets.QLabel("TOF", self)
+        self.batteryLabel = QtWidgets.QLabel("batter", self)
+        self.motorTimeLabel = QtWidgets.QLabel("motorTime", self)
+        self.heightLabel = QtWidgets.QLabel("height", self)
+        self.xAccelLabel = QtWidgets.QLabel("xAccel", self)
+        self.yAccelLabel = QtWidgets.QLabel("yAccel", self)
+        self.zAccelLabel = QtWidgets.QLabel("zAccel", self)
+
 
         self.initUI()
 
@@ -235,35 +202,54 @@ class guiForDrone(QWidget):
         landBtn.setGeometry(QtCore.QRect(590, 525, 100, 50))
         landBtn.clicked[bool].connect(self.land)
 
-        self.speedLabel = QtWidgets.QLabel('Speed: ', self)
-        self.speedLabel.setGeometry(QtCore.QRect(900, 10, 75, 20))
+        # self.speedLabel = QtWidgets.QLabel('Speed: ', self)
+        self.pitchLabel = QtWidgets.QLabel("pitch", self)
+        self.pitchLabel.setGeometry(QtCore.QRect(900, 10, 350, 20))
 
-        self.batteryLabel = QtWidgets.QLabel('Battery: ', self)
-        self.batteryLabel.setGeometry(QtCore.QRect(900, 35, 75, 20))
+        self.rollLabel = QtWidgets.QLabel("roll", self)
+        self.rollLabel.setGeometry(QtCore.QRect(900, 35, 350, 20))
 
-        self.timeLabel = QtWidgets.QLabel('Time: ', self)
-        self.timeLabel.setGeometry(QtCore.QRect(900, 60, 75, 20))
+        self.yawLabel = QtWidgets.QLabel("yaw", self)
+        self.yawLabel.setGeometry(QtCore.QRect(900, 60, 350, 20))
 
-        self.heightLabel = QtWidgets.QLabel('Height: ', self)
-        self.heightLabel.setGeometry(QtCore.QRect(900, 85, 75, 20))
+        self.xSpeedLabel = QtWidgets.QLabel("xSpeed", self)
+        self.xSpeedLabel.setGeometry(QtCore.QRect(900, 85, 3505, 20))
 
-        self.tempLabel = QtWidgets.QLabel('Temp: ', self)
-        self.tempLabel.setGeometry(QtCore.QRect(900, 110, 75, 20))
+        self.ySpeedLabel = QtWidgets.QLabel("ySpeed", self)
+        self.ySpeedLabel.setGeometry(QtCore.QRect(900, 110, 350, 20))
 
-        self.attitudeLabel = QtWidgets.QLabel('Attitude: ', self)
-        self.attitudeLabel.setGeometry(QtCore.QRect(900, 135, 75, 20))
+        self.zSpeedLabel = QtWidgets.QLabel("zSpeed", self)
+        self.zSpeedLabel.setGeometry(QtCore.QRect(900, 135, 350, 20))
 
-        self.barometerLabel = QtWidgets.QLabel('Barometer: ', self)
-        self.barometerLabel.setGeometry(QtCore.QRect(900, 160, 75, 20))
+        self.lowestTempLabel = QtWidgets.QLabel("lowestTemp", self)
+        self.lowestTempLabel.setGeometry(QtCore.QRect(900, 160, 350, 20))
 
-        self.accelerationLabel = QtWidgets.QLabel('Acceleration: ', self)
-        self.accelerationLabel.setGeometry(QtCore.QRect(900, 185, 81, 20))
+        self.highestTempLabel = QtWidgets.QLabel("highestTemp", self)
+        self.highestTempLabel.setGeometry(QtCore.QRect(900, 185, 350, 20))
 
-        self.tofLabel = QtWidgets.QLabel('TOF: ', self)
-        self.tofLabel.setGeometry(QtCore.QRect(900, 210, 75, 20))
+        self.barometerLabel = QtWidgets.QLabel("barometer", self)
+        self.barometerLabel.setGeometry(QtCore.QRect(900, 210, 75, 20))
 
-        self.wifiLabel = QtWidgets.QLabel('Wifi: ', self)
-        self.wifiLabel.setGeometry(QtCore.QRect(900, 235, 75, 20))
+        self.TOFLabel = QtWidgets.QLabel("TOF", self)
+        self.TOFLabel.setGeometry(QtCore.QRect(900, 235, 350, 20))
+
+        self.batteryLabel = QtWidgets.QLabel("batter", self)
+        self.batteryLabel.setGeometry(QtCore.QRect(900, 260, 350, 20))
+
+        self.motorTimeLabel = QtWidgets.QLabel("motorTime", self)
+        self.motorTimeLabel.setGeometry(QtCore.QRect(900, 285, 350, 20))
+
+        self.heightLabel = QtWidgets.QLabel("height", self)
+        self.heightLabel.setGeometry(QtCore.QRect(900, 310, 350, 20))
+
+        self.xAccelLabel = QtWidgets.QLabel("xAccel", self)
+        self.xAccelLabel.setGeometry(QtCore.QRect(900, 335, 350, 20))
+
+        self.yAccelLabel = QtWidgets.QLabel("yAccel", self)
+        self.yAccelLabel.setGeometry(QtCore.QRect(900, 360, 350, 20))
+
+        self.zAccelLabel = QtWidgets.QLabel("zAccel", self)
+        self.zAccelLabel.setGeometry(QtCore.QRect(900, 385, 350, 20))
 
         flyPolygonBtn = QtWidgets.QPushButton('Fly Polygon', self)
         flyPolygonBtn.setGeometry(QtCore.QRect(490, 660, 100, 30))
@@ -306,26 +292,40 @@ class guiForDrone(QWidget):
         self.show()
 
     def updateLabels(self):
-        speed = "Speed: " + str(self.getspeed())
-        battery = "Battery: " + str(self.getbattery())
-        time = str(self.gettime())
-        height = str(self.getheight())
-        temp = str(self.gettemp())
-        attitude = str(self.getattitude())
-        barometer = str(self.getbarometer())
-        acceleration = str(self.getacceleration())
-        tof = str(self.gettof())
-        wifi = str(self.getwifi())
-        self.speedLabel.setText(speed)
-        self.batteryLabel.setText(battery)
-        self.timeLabel.setText(time)
-        self.heightLabel.setText(height)
-        self.tempLabel.setText(temp)
-        self.attitudeLabel.setText(attitude)
+        info = instance.getDat()
+        pitch = "pitch" + str(info['pitch'])
+        roll = "roll" + str(info['roll'])
+        yaw = "yaw" + str(info['yaw'])
+        xSpeed = "xSpeed" + str(info['xSpeed'])
+        ySpeed = "ySpeed" + str(info['ySpeed'])
+        zSpeed = "zSpeed" + str(info["zSpeed"])
+        lowestTemp = "lowestTemp" + str(info['lowestTemp'])
+        highestTemp = "highestTemp" + str(info['highestTemp'])
+        barometer = "barometer" + str(info['barometer'])
+        TOF = "TOF" + str(info['TOF'])
+        battery = "battery" + str(info['battery%'])
+        motorTime = "motorTime" + str(info['motorTime'])
+        height = "height" + str(info['height'])
+        xAccel = "xAccel" + str(info['xAccel'])
+        yAccel = "yAccel" + str(info['yAccel'])
+        zAccel = "zAccel" + str(info['zAccel'])
+        self.pitchLabel.setText(pitch)
+        self.rollLabel.setText(roll)
+        self.yawLabel.setText(yaw)
+        self.xSpeedLabel.setText(xSpeed)
+        self.ySpeedLabel.setText(ySpeed)
+        self.zSpeedLabel.setText(zSpeed)
+        self.lowestTempLabel.setText(lowestTemp)
+        self.highestTempLabel.setText(highestTemp)
         self.barometerLabel.setText(barometer)
-        self.accelerationLabel.setText(acceleration)
-        self.tofLabel.setText(tof)
-        self.wifiLabel.setText(wifi)
+        self.TOFLabel.setText(TOF)
+        self.batteryLabel.setText(battery)
+        self.motorTimeLabel.setText(motorTime)
+        self.heightLabel.setText(height)
+        self.xAccelLabel.setText(xAccel)
+        self.yAccelLabel.setText(yAccel)
+        self.zAccelLabel.setText(zAccel)
+        
         self.update()
 
 def main():
