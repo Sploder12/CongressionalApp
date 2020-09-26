@@ -107,23 +107,26 @@ class guiForDrone(QWidget):
         self.setFixedWidth(1280)
         self.setFixedHeight(720)
 
-        self.pitchLabel = QtWidgets.QLabel("pitch", self)
-        self.rollLabel = QtWidgets.QLabel("roll", self)
-        self.yawLabel = QtWidgets.QLabel("yaw", self)
-        self.pitchLabel = QtWidgets.QLabel("pitch", self)
-        self.xSpeedLabel = QtWidgets.QLabel("xSpeed", self)
-        self.ySpeedLabel = QtWidgets.QLabel("ySpeed", self)
-        self.zSpeedLabel = QtWidgets.QLabel("zSpeed", self)
-        self.lowestTempLabel = QtWidgets.QLabel("lowestTemp", self)
-        self.highestTempLabel = QtWidgets.QLabel("highestTemp", self)
-        self.barometerLabel = QtWidgets.QLabel("barometer", self)
-        self.TOFLabel = QtWidgets.QLabel("TOF", self)
-        self.batteryLabel = QtWidgets.QLabel("batter", self)
-        self.motorTimeLabel = QtWidgets.QLabel("motorTime", self)
-        self.heightLabel = QtWidgets.QLabel("height", self)
-        self.xAccelLabel = QtWidgets.QLabel("xAccel", self)
-        self.yAccelLabel = QtWidgets.QLabel("yAccel", self)
-        self.zAccelLabel = QtWidgets.QLabel("zAccel", self)
+        self.pitchLabel = QtWidgets.QLabel("pitch: ", self)
+        self.rollLabel = QtWidgets.QLabel("roll: ", self)
+        self.yawLabel = QtWidgets.QLabel("yaw: ", self)
+        self.pitchLabel = QtWidgets.QLabel("pitch: ", self)
+        self.xSpeedLabel = QtWidgets.QLabel("xSpeed: ", self)
+        self.ySpeedLabel = QtWidgets.QLabel("ySpeed: ", self)
+        self.zSpeedLabel = QtWidgets.QLabel("zSpeed: ", self)
+        self.lowestTempLabel = QtWidgets.QLabel("lowestTemp: ", self)
+        self.highestTempLabel = QtWidgets.QLabel("highestTemp: ", self)
+        self.barometerLabel = QtWidgets.QLabel("barometer: ", self)
+        self.TOFLabel = QtWidgets.QLabel("TOF: ", self)
+        self.batteryLabel = QtWidgets.QLabel("battery: ", self)
+        self.motorTimeLabel = QtWidgets.QLabel("motorTime: ", self)
+        self.heightLabel = QtWidgets.QLabel("height: ", self)
+        self.xAccelLabel = QtWidgets.QLabel("xAccel: ", self)
+        self.yAccelLabel = QtWidgets.QLabel("yAccel: ", self)
+        self.zAccelLabel = QtWidgets.QLabel("zAccel: ", self)
+
+        self.speedValue = QLCDNumber(self)
+        self.batteryPercentage = QProgressBar(self)
 
 
         self.initUI()
@@ -163,9 +166,9 @@ class guiForDrone(QWidget):
         downBtn.clicked[bool].connect(self.down)
 
         #battery percentage
-        batteryPercentage = QProgressBar(self)
-        batteryPercentage.setGeometry(QtCore.QRect(50, 50, 300, 75))
-        batteryPercentage.setProperty("value", 24) #SET VALUE OF BATTERY
+        self.batteryPercentage = QProgressBar(self)
+        self.batteryPercentage.setGeometry(QtCore.QRect(50, 50, 300, 75))
+        self.batteryPercentage.setProperty("value", 24) #SET VALUE OF BATTERY
 
         #ccW
         ccWBtn = QPushButton('CCW', self)
@@ -177,20 +180,20 @@ class guiForDrone(QWidget):
         cWBtn.setGeometry(QtCore.QRect(1080, 490, 100, 50))
         cWBtn.clicked[bool].connect(self.cW)
 
-        #set speed slider
-        speedSlider = QSlider(self)
-        speedSlider.setMinimum(1)
-        speedSlider.setMaximum(100)
-        speedSlider.setValue(20)
-        speedSlider.setTickPosition(QSlider.TicksBelow)
-        speedSlider.setTickInterval(5)
-        speedSlider.setGeometry(QtCore.QRect(390, 275, 500, 50))
-        speedSlider.setOrientation(QtCore.Qt.Horizontal)
-        speedSlider.valueChanged.connect(self.speed)
+        # #set speed slider
+        # speedSlider = QSlider(self)
+        # speedSlider.setMinimum(1)
+        # speedSlider.setMaximum(100)
+        # speedSlider.setValue(20)
+        # speedSlider.setTickPosition(QSlider.TicksBelow)
+        # speedSlider.setTickInterval(5)
+        # speedSlider.setGeometry(QtCore.QRect(390, 275, 500, 50))
+        # speedSlider.setOrientation(QtCore.Qt.Horizontal)
+        # speedSlider.valueChanged.connect(self.speed)
 
         #speed value
-        speedValue = QLCDNumber(self)
-        speedValue.setGeometry(QtCore.QRect(490, 100, 300, 150))
+        self.speedValue = QLCDNumber(self)
+        self.speedValue.setGeometry(QtCore.QRect(490, 100, 300, 150))
 
         #takeoff
         takeoffBtn = QPushButton('Takeoff', self)
@@ -291,6 +294,12 @@ class guiForDrone(QWidget):
         self.setGeometry(300, 300, 300, 200)
         self.show()
 
+    def proper_round(num, dec=0):
+        num = str(num)[:str(num).index('.')+dec+2]
+        if num[-1]>='5':
+            return float(num[:-2-(not dec)]+str(int(num[-2-(not dec)])+1))
+        return float(num[:-1])    
+
     def updateLabels(self):
         info = instance.getDat()
         pitch = "pitch" + str(info['pitch'])
@@ -325,6 +334,9 @@ class guiForDrone(QWidget):
         self.xAccelLabel.setText(xAccel)
         self.yAccelLabel.setText(yAccel)
         self.zAccelLabel.setText(zAccel)
+
+        self.batteryPercentage.setProperty("value", info['battery%']) #SET VALUE OF BATTERY
+        self.speedValue.intValue(math.floor((info['xSpeed'])))
         
         self.update()
 
