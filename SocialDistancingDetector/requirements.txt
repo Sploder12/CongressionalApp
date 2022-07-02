@@ -1,5 +1,5 @@
 scipy==1.5.2
-numpy==1.19.1
+numpy==1.22.0
 wheel==0.34.2
 mkl==2019.0
 intel-openmp==2019.0
